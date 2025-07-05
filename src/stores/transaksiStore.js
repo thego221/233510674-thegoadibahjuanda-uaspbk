@@ -1,76 +1,93 @@
+// stores/transaksiStore.js
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
 export const useTransaksiStore = defineStore('transaksi', {
-  state: () => ({
-    pesanan: [],           // Keranjang saat ini
-    transaksiList: []      // Semua transaksi yang tersimpan
-  }),
+    state: () => ({
+        pesanan: [],
+        transaksiList: [],
+        isSubmitted: false
+    }),
 
-  getters: {
-    totalPesanan(state) {
-      return state.pesanan.reduce((total, item) => {
-        return total + item.harga * item.jumlah
-      }, 0)
-    }
-  },
-
-  actions: {
-    tambahPesanan(item) {
-      const existing = this.pesanan.find(p => p.id_menu === item.id)
-      if (existing) {
-        existing.jumlah++
-      } else {
-        this.pesanan.push({
-          id_menu: item.id,
-          nama_menu: item.nama,
-          harga: item.harga,
-          jumlah: 1
-        })
-      }
-    },
-
-    kurangiPesanan(id_menu, nama_menu) {
-      const index = this.pesanan.findIndex(p => p.id_menu === id_menu && p.nama_menu === nama_menu)
-      if (index !== -1) {
-        if (this.pesanan[index].jumlah > 1) {
-          this.pesanan[index].jumlah--
-        } else {
-          this.pesanan.splice(index, 1)
+    getters: {
+        totalPesanan: (state) => {
+            return state.pesanan.reduce((total, item) => total + item.harga * item.jumlah, 0)
         }
-      }
     },
 
-    hapusPesanan(id_menu, nama_menu) {
-      this.pesanan = this.pesanan.filter(p => !(p.id_menu === id_menu && p.nama_menu === nama_menu))
-    },
+    actions: {
+        tambahPesanan(item) {
+            const existing = this.pesanan.find(p => p.id_menu === item.id)
+            if (existing) {
+                existing.jumlah++
+            } else {
+                this.pesanan.push({
+                    id_menu: item.id,
+                    nama_menu: item.nama,
+                    harga: item.harga,
+                    jumlah: 1
+                })
+            }
+        },
 
-    async simpanTransaksi(meja = '') {
-      if (this.pesanan.length === 0) return
+        kurangiPesanan(id_menu, nama_menu) {
+            const item = this.pesanan.find(p => p.id_menu === id_menu && p.nama_menu === nama_menu)
+            if (item && item.jumlah > 1) {
+                item.jumlah--
+            } else {
+                this.hapusPesanan(id_menu, nama_menu)
+            }
+        },
 
-      const data = {
-        tanggal: new Date().toISOString(),
-        meja: meja || 'Tanpa Meja',
-        pesanan: JSON.parse(JSON.stringify(this.pesanan)) // deep copy
-      }
+        hapusPesanan(id_menu, nama_menu) {
+            this.pesanan = this.pesanan.filter(
+                p => !(p.id_menu === id_menu && p.nama_menu === nama_menu)
+            )
+        },
 
-      try {
-        await axios.post('http://localhost:3000/transaksi', data)
-        this.pesanan = []
-        await this.fetchTransaksi()
-      } catch (error) {
-        console.error('❌ Gagal menyimpan transaksi:', error)
-      }
-    },
+        async simpanTransaksi({ mejaId }) {
+            if (this.isSubmitted || this.pesanan.length === 0) return
 
-    async fetchTransaksi() {
-      try {
-        const res = await axios.get('http://localhost:3000/transaksi')
-        // Urutkan dari terbaru ke lama
-        this.transaksiList = res.data.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal))
-      } catch (error) {
-        console.error('❌ Gagal mengambil data transaksi:', error)
-      }
+            this.isSubmitted = true
+
+            const newTrx = {
+                id: Date.now().toString(),
+                tanggal: new Date().toISOString(),
+                pesanan: JSON.parse(JSON.stringify(this.pesanan)),
+                mejaId: mejaId,
+                selesai: false // ⬅️ ini penting
+            }
+
+
+            try {
+                await axios.post('http://localhost:3000/transaksi', newTrx)
+                this.transaksiList.unshift(newTrx)
+                this.pesanan = []
+            } catch (err) {
+                console.error('Gagal menyimpan transaksi', err)
+            } finally {
+                this.isSubmitted = false
+            }
+        },
+
+        async fetchTransaksi() {
+            try {
+                const res = await axios.get('http://localhost:3000/transaksi')
+                this.transaksiList = res.data.reverse()
+            } catch (err) {
+                console.error('Gagal mengambil data transaksi', err)
+            }
+        },
+
+        async tandaiSelesai(trx) {
+            this.fetchTransaksi()
+            const transaksi = this.transaksiList.find(t => t.id === trx.id)
+            transaksi.selesai = true
+            try {
+                await axios.put(`http://localhost:3000/transaksi/${trx.id}`, transaksi)
+            } catch (err) {
+                console.error('Gagal memperbarui status transaksi', err)
+            }
+        }
     }
-  }
 })
