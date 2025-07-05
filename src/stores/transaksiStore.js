@@ -60,7 +60,7 @@ export const useTransaksiStore = defineStore('transaksi', {
 
 
             try {
-                await axios.post('http://localhost:3000/transaksi', newTrx)
+                await axios.post('https://square-nebulous-twine.glitch.me/transaksi', newTrx)
                 this.transaksiList.unshift(newTrx)
                 this.pesanan = []
             } catch (err) {
@@ -72,7 +72,7 @@ export const useTransaksiStore = defineStore('transaksi', {
 
         async fetchTransaksi() {
             try {
-                const res = await axios.get('http://localhost:3000/transaksi')
+                const res = await axios.get('https://square-nebulous-twine.glitch.me/transaksi')
                 this.transaksiList = res.data.reverse()
             } catch (err) {
                 console.error('Gagal mengambil data transaksi', err)
@@ -84,7 +84,7 @@ export const useTransaksiStore = defineStore('transaksi', {
             const transaksi = this.transaksiList.find(t => t.id === trx.id)
             transaksi.selesai = true
             try {
-                await axios.put(`http://localhost:3000/transaksi/${trx.id}`, transaksi)
+                await axios.put(`https://square-nebulous-twine.glitch.me/transaksi/${trx.id}`, transaksi)
             } catch (err) {
                 console.error('Gagal memperbarui status transaksi', err)
             }
