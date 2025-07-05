@@ -1,10 +1,9 @@
 <script setup>
+import Navbar from './components/Navbar.vue';
 </script>
 
 <template>
-  <div class="text-red-500">
-    test
-  </div>
+  <Navbar />
 </template>
 
 <style scoped></style>

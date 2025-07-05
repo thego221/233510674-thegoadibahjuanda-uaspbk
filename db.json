@@ -1,0 +1,48 @@
+{
+  "transaksi": [
+    {
+      "id": 1,
+      "tanggal": "2025-07-04T11:30:00.000Z",
+      "meja": "Meja 2",
+      "pesanan": [
+        {
+          "id_menu": 1,
+          "nama_menu": "Nasi Goreng Spesial",
+          "harga": 25000,
+          "jumlah": 2
+        },
+        {
+          "id_menu": 6,
+          "nama_menu": "Jus Alpukat",
+          "harga": 15000,
+          "jumlah": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "tanggal": "2025-07-04T13:15:00.000Z",
+      "meja": "Meja 1",
+      "pesanan": [
+        {
+          "id_menu": 3,
+          "nama_menu": "Sate Ayam",
+          "harga": 30000,
+          "jumlah": 1
+        },
+        {
+          "id_menu": 9,
+          "nama_menu": "Puding Coklat",
+          "harga": 12000,
+          "jumlah": 1
+        },
+        {
+          "id_menu": 5,
+          "nama_menu": "Es Teh Manis",
+          "harga": 8000,
+          "jumlah": 2
+        }
+      ]
+    }
+  ]
+}
