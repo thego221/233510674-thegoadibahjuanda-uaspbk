@@ -80,11 +80,11 @@ export const useTransaksiStore = defineStore('transaksi', {
         },
 
         async tandaiSelesai(trx) {
-            this.fetchTransaksi()
             const transaksi = this.transaksiList.find(t => t.id === trx.id)
             transaksi.selesai = true
             try {
                 await axios.put(`https://square-nebulous-twine.glitch.me/transaksi/${trx.id}`, transaksi)
+                this.fetchTransaksi()
             } catch (err) {
                 console.error('Gagal memperbarui status transaksi', err)
             }
