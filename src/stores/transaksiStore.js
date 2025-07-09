@@ -60,7 +60,7 @@ export const useTransaksiStore = defineStore('transaksi', {
 
 
             try {
-                await axios.post('https://d7eb6bbb-30d0-4b5d-a25f-3b4e532554d6-00-80c5d28awklx.pike.replit.dev/transaksi', newTrx)
+                await axios.post('https://uas-server-production-1568.up.railway.app/transaksi', newTrx)
                 this.transaksiList.unshift(newTrx)
                 this.pesanan = []
             } catch (err) {
@@ -72,7 +72,7 @@ export const useTransaksiStore = defineStore('transaksi', {
 
         async fetchTransaksi() {
             try {
-                const res = await axios.get('https://d7eb6bbb-30d0-4b5d-a25f-3b4e532554d6-00-80c5d28awklx.pike.replit.dev/transaksi')
+                const res = await axios.get('https://uas-server-production-1568.up.railway.app/transaksi')
                 this.transaksiList = res.data.reverse()
             } catch (err) {
                 console.error('Gagal mengambil data transaksi', err)
@@ -83,7 +83,7 @@ export const useTransaksiStore = defineStore('transaksi', {
             const transaksi = this.transaksiList.find(t => t.id === trx.id)
             transaksi.selesai = true
             try {
-                await axios.put(`https://d7eb6bbb-30d0-4b5d-a25f-3b4e532554d6-00-80c5d28awklx.pike.replit.dev/${trx.id}`, transaksi)
+                await axios.put(`https://uas-server-production-1568.up.railway.app/${trx.id}`, transaksi)
                 this.fetchTransaksi()
             } catch (err) {
                 console.error('Gagal memperbarui status transaksi', err)
